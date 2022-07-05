@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.eugenics.movieapplication.ui.screens.movie.MovieScreen
 import com.eugenics.movieapplication.ui.screens.movies.MoviesScreen
 import com.eugenics.movieapplication.ui.viewmodels.MainViewModel
 
@@ -22,7 +23,14 @@ fun NavGraph(navController: NavHostController) {
                 navController = navController,
                 moviesResponse = viewModel.movies,
                 message = viewModel.message,
-                status = viewModel.status
+                status = viewModel.status,
+                onMovieClick = { viewModel.setMovie(movie = it) }
+            )
+        }
+        composable(route = Screens.Movie.route) {
+            MovieScreen(
+                navController = navController,
+                movie = viewModel.getMovie()
             )
         }
     }
