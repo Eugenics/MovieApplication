@@ -26,6 +26,8 @@ class MainViewModel @Inject constructor(private val useCases: UseCases) : ViewMo
     private val _status: MutableStateFlow<Status> = MutableStateFlow(Status.LOADING)
     val status: StateFlow<Status> = _status
 
+    private val movie = mutableListOf<Movie>()
+
     init {
         getMovies()
     }
@@ -51,4 +53,11 @@ class MainViewModel @Inject constructor(private val useCases: UseCases) : ViewMo
             }
         }
     }
+
+    fun setMovie(movie: Movie) {
+        this.movie.clear()
+        this.movie.add(movie)
+    }
+
+    fun getMovie(): Movie = movie.first()
 }

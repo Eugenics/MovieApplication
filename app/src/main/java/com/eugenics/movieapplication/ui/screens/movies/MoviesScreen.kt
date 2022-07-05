@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.eugenics.movieapplication.domain.model.Movie
 import com.eugenics.movieapplication.domain.util.Status
+import com.eugenics.movieapplication.navigation.Screens
 import com.eugenics.movieapplication.ui.screens.movies.components.MovieRow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -20,7 +21,8 @@ fun MoviesScreen(
     navController: NavHostController,
     moviesResponse: StateFlow<List<Movie>>,
     message: StateFlow<String>,
-    status: StateFlow<Status>
+    status: StateFlow<Status>,
+    onMovieClick: (movie: Movie) -> Unit
 ) {
     val movies = moviesResponse.collectAsState()
     val state = status.collectAsState()
@@ -34,7 +36,10 @@ fun MoviesScreen(
         ) {
             if (state.value == Status.SUCCESS) {
                 items(movies.value) { movie ->
-                    MovieRow(movie = movie, onRowClick = {})
+                    MovieRow(movie = movie, onRowClick = {
+                        onMovieClick(movie)
+                        navController.navigate(Screens.Movie.route)
+                    })
                 }
             } else {
                 item {
