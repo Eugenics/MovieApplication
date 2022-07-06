@@ -1,51 +1,63 @@
 package com.eugenics.movieapplication.ui.screens.movies
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.eugenics.movieapplication.domain.model.Movie
 import com.eugenics.movieapplication.domain.util.Status
 import com.eugenics.movieapplication.navigation.Screens
 import com.eugenics.movieapplication.ui.screens.movies.components.MovieRow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MoviesScreen(
     navController: NavHostController,
-    moviesResponse: StateFlow<List<Movie>>,
-    message: StateFlow<String>,
-    status: StateFlow<Status>,
+    moviesPaging: LazyPagingItems<Movie>,
     onMovieClick: (movie: Movie) -> Unit
 ) {
-    val movies = moviesResponse.collectAsState()
-    val state = status.collectAsState()
-    val listState = rememberLazyListState()
+    val stateClass = rememberScreenState(lazyListState = rememberLazyListState())
+    val listState = stateClass.lazyListState
 
     Scaffold { paddingValues ->
-        LazyVerticalGrid(
+        LazyColumn(
             contentPadding = paddingValues,
-            state = listState,
-            cells = GridCells.Adaptive(minSize = 128.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            state = listState
         ) {
-            if (state.value == Status.SUCCESS) {
-                items(movies.value) { movie ->
+            items(items = moviesPaging,
+                key = {
+                    it.id
+                }) { movie ->
+                movie?.let {
                     MovieRow(movie = movie, onRowClick = {
                         onMovieClick(movie)
                         navController.navigate(Screens.Movie.route)
                     })
                 }
-            } else {
-                item {
-                    Text(text = message.value, style = MaterialTheme.typography.h3)
-                }
             }
         }
     }
 }
+
+class MovieScreenState(
+    val lazyListState: LazyListState
+)
+
+@Composable
+fun rememberScreenState(lazyListState: LazyListState): MovieScreenState =
+    MovieScreenState(lazyListState = lazyListState)

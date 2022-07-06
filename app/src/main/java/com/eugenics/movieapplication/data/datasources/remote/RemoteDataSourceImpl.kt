@@ -1,29 +1,20 @@
 package com.eugenics.movieapplication.data.datasources.remote
 
-import com.eugenics.movieapplication.BuildConfig
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.eugenics.movieapplication.data.api.TmdbApi
-import com.eugenics.movieapplication.data.model.MoviesResponse
+import com.eugenics.movieapplication.data.datasources.pagingsource.PagingDataSource
 import com.eugenics.movieapplication.domain.core.RemoteDataSource
-import com.eugenics.movieapplication.domain.util.Response
+import com.eugenics.movieapplication.domain.model.Movie
+import com.eugenics.movieapplication.domain.util.PAGE_SIZE
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class RemoteDataSourceImpl(private val api: TmdbApi) : RemoteDataSource {
-    override suspend fun getMovies(page: Int): Flow<Response<MoviesResponse>> =
-        flow {
-            emit(Response.Loading())
-            try {
-                emit(
-                    Response.Success(
-                        data = api.getMoviesList(apiKey = BuildConfig.API_KEY, page = page)
-                            .await()
-                    )
-                )
-            } catch (ex: Exception) {
-                emit(
-                    Response.Error(message = ex.message.toString())
-                )
-            }
-        }
-
+    override fun getMoviesPage(): Flow<PagingData<Movie>> =
+        Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
+            pagingSourceFactory =
+            { PagingDataSource(api = api) }
+        ).flow
 }

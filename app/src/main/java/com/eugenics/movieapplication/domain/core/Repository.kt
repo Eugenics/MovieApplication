@@ -1,9 +1,9 @@
 package com.eugenics.movieapplication.domain.core
 
-import com.eugenics.movieapplication.data.model.MoviesResponse
-import com.eugenics.movieapplication.domain.util.Response
+import androidx.paging.PagingData
+import com.eugenics.movieapplication.domain.model.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
-    suspend fun getMoviesRemote(page: Int): Flow<Response<MoviesResponse>>
+    fun getPagingMoviesRemote(): Flow<PagingData<Movie>>
 }

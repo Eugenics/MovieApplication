@@ -1,31 +1,28 @@
 package com.eugenics.movieapplication.domain.usecases
 
-import com.eugenics.movieapplication.data.model.convertToModel
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.eugenics.movieapplication.domain.core.Repository
 import com.eugenics.movieapplication.domain.model.Movie
 import com.eugenics.movieapplication.domain.util.Response
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class GetMovieListUseCase @Inject constructor(private val repository: Repository) {
-    private suspend fun getMoviesList(page: Int = 1): Flow<Response<List<Movie>>> =
+class GetMovieListUseCase(
+    private val repository: Repository
+) {
+
+    operator fun invoke(scope: CoroutineScope): Flow<Response<PagingData<Movie>>> =
         flow {
-            repository.getMoviesRemote(page = page).collect { response ->
-                when (response) {
-                    is Response.Success -> emit(
-                        Response.Success(
-                            data = response.data?.results?.map {
-                                it.convertToModel()
-                            })
-                    )
-                    is Response.Error -> Response.Error<List<Movie>>(
-                        message = response.message ?: ""
-                    )
-                    else -> emit(Response.Loading())
+            emit(Response.Loading())
+            try {
+                repository.getPagingMoviesRemote().cachedIn(scope = scope).collect {
+                    emit(Response.Success(data = it))
                 }
+            } catch (ex: Exception) {
+                emit(Response.Error(message = ex.message.toString()))
             }
         }
 
-    suspend operator fun invoke(page: Int): Flow<Response<List<Movie>>> = getMoviesList(page = page)
 }

@@ -1,6 +1,5 @@
-package com.eugenics.movieapplication.data.model
+package com.eugenics.movieapplication.domain.model
 
-import com.eugenics.movieapplication.domain.model.Movie
 import com.google.gson.annotations.SerializedName
 
 data class MoviesResponse(
