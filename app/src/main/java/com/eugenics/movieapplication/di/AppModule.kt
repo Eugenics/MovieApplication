@@ -7,6 +7,7 @@ import com.eugenics.movieapplication.data.repository.RepositoryImpl
 import com.eugenics.movieapplication.domain.core.RemoteDataSource
 import com.eugenics.movieapplication.domain.core.Repository
 import com.eugenics.movieapplication.domain.usecases.GetMovieListUseCase
+import com.eugenics.movieapplication.domain.usecases.SearchMovieUseCase
 import com.eugenics.movieapplication.domain.usecases.UseCases
 import com.eugenics.movieapplication.domain.util.MAIN_URL
 import com.google.gson.FieldNamingPolicy
@@ -69,7 +70,8 @@ class AppModule {
     @Provides
     fun provideUseCases(repository: Repository): UseCases =
         UseCases(
-            getMovieListUseCase = GetMovieListUseCase(repository = repository)
+            getMovieListUseCase = GetMovieListUseCase(repository = repository),
+            searchMovieUseCase = SearchMovieUseCase(repository = repository)
         )
 
     @Singleton

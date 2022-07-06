@@ -11,4 +11,11 @@ interface TmdbApi {
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): MoviesResponse
+
+    @GET("search/movie")
+    suspend fun searchMovie(
+        @Query("query") queryString: String,
+        @Query("api_key") apiKey: String,
+        @Query("page") page: Int = 1
+    ): MoviesResponse
 }

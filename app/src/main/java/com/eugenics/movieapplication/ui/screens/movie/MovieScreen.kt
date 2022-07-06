@@ -44,7 +44,8 @@ fun MovieScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(imageVector = Icons.Filled.Close, contentDescription = null)
                     }
-                }
+                },
+                elevation = AppBarDefaults.TopAppBarElevation
             )
         }
     ) { paddingValues ->

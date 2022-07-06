@@ -42,9 +42,9 @@ class MainViewModel @Inject constructor(
 
     fun getMovie(): Movie = movie.first()
 
-    private fun getPagingMovies() {
+    fun getPagingMovies() {
         viewModelScope.launch(Dispatchers.IO) {
-            useCases.getMovieListUseCase.invoke(scope = viewModelScope).collect { response ->
+            useCases.getMovieListUseCase(scope = viewModelScope).collect { response ->
                 _status.value = response.status ?: Status.LOADING
                 when (response.status ?: Status.LOADING) {
                     Status.SUCCESS -> {
@@ -54,6 +54,23 @@ class MainViewModel @Inject constructor(
                     else -> _message.value = "Loading..."
                 }
             }
+        }
+    }
+
+    fun searchMovie(queryString: String) {
+        _movieList.value = PagingData.empty()
+        viewModelScope.launch(Dispatchers.IO) {
+            useCases.searchMovieUseCase(queryString = queryString, scope = viewModelScope)
+                .collect { response ->
+                    _status.value = response.status ?: Status.LOADING
+                    when (response.status ?: Status.LOADING) {
+                        Status.SUCCESS -> {
+                            _movieList.value = response.data ?: PagingData.empty()
+                        }
+                        Status.ERROR -> _message.value = response.message ?: ""
+                        else -> _message.value = "Loading..."
+                    }
+                }
         }
     }
 }
