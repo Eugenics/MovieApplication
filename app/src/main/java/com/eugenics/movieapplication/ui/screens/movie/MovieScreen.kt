@@ -53,6 +53,7 @@ fun MovieScreen(
                 .verticalScroll(state = scrollableState)
         ) {
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth()
                     .padding(10.dp)
             ) {

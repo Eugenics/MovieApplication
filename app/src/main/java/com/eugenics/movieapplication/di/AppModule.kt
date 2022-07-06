@@ -1,6 +1,7 @@
 package com.eugenics.movieapplication.di
 
 import com.eugenics.movieapplication.data.api.TmdbApi
+import com.eugenics.movieapplication.data.datasources.pagingsource.PagingDataSource
 import com.eugenics.movieapplication.data.datasources.remote.RemoteDataSourceImpl
 import com.eugenics.movieapplication.data.repository.RepositoryImpl
 import com.eugenics.movieapplication.domain.core.RemoteDataSource
@@ -16,13 +17,24 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+    @Singleton
+    @Provides
+    fun provideHttpClient(): OkHttpClient =
+        OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .build()
 
     @Singleton
     @Provides
@@ -34,11 +46,12 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideTmdbApi(gson: Gson): TmdbApi =
+    fun provideTmdbApi(gson: Gson, client: OkHttpClient): TmdbApi =
         Retrofit.Builder()
             .baseUrl(MAIN_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
+//            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
             .create(TmdbApi::class.java)
 
@@ -48,10 +61,18 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideRepository(remote: RemoteDataSource): Repository = RepositoryImpl(remote = remote)
+    fun provideRepository(
+        remote: RemoteDataSource
+    ): Repository = RepositoryImpl(remote = remote)
 
     @Singleton
     @Provides
     fun provideUseCases(repository: Repository): UseCases =
-        UseCases(getMovieListUseCase = GetMovieListUseCase(repository = repository))
+        UseCases(
+            getMovieListUseCase = GetMovieListUseCase(repository = repository)
+        )
+
+    @Singleton
+    @Provides
+    fun providePagingSource(api: TmdbApi): PagingDataSource = PagingDataSource(api = api)
 }
