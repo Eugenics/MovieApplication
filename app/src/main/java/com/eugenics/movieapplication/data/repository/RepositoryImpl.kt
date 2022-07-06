@@ -11,4 +11,7 @@ class RepositoryImpl(
 ) : Repository {
     override fun getPagingMoviesRemote(): Flow<PagingData<Movie>> =
         remote.getMoviesPage()
+
+    override fun getPagingSearchMovieRemote(queryString: String): Flow<PagingData<Movie>> =
+        remote.searchMovie(queryString = queryString)
 }

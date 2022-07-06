@@ -1,6 +1,7 @@
 package com.eugenics.movieapplication.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,7 +24,11 @@ fun NavGraph(navController: NavHostController) {
             MoviesScreen(
                 navController = navController,
                 moviesPaging = viewModel.pageMovies.collectAsLazyPagingItems(),
-                onMovieClick = { viewModel.setMovie(movie = it) }
+                status = viewModel.status.collectAsState().value,
+                message = viewModel.message.collectAsState().value,
+                onMovieClick = { viewModel.setMovie(movie = it) },
+                onSearchClicked = { viewModel.searchMovie(queryString = it) },
+                reloadMovieHandler = { viewModel.getPagingMovies() }
             )
         }
         composable(route = Screens.Movie.route) {

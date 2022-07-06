@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteDataSource : DataSource {
     fun getMoviesPage(): Flow<PagingData<Movie>>
+    fun searchMovie(queryString: String): Flow<PagingData<Movie>>
 }

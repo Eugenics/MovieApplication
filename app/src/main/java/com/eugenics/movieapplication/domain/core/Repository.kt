@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
     fun getPagingMoviesRemote(): Flow<PagingData<Movie>>
+    fun getPagingSearchMovieRemote(queryString: String): Flow<PagingData<Movie>>
 }
